@@ -12,6 +12,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
+import seo.study.studyspringapplication.domain.Account;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,6 +71,9 @@ class AccountControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"));
 
+        Account account = accountRepository.findByEmail("tjwjdgks@naver.com");
+        assertNotNull(account);
+        assertNotEquals(account.getPassword(),"12345678");
         assertTrue(accountRepository.existsByEmail("tjwjdgks@naver.com"));
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
     }
