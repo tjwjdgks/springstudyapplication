@@ -60,7 +60,7 @@ public class AccountService {
         // entity manager 생성자로 사용하는 방법, 비 정석
         // 인코딩하는 비밀번호를 사용할 수 있음
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                account.getNickname(),
+                new UserAccount(account),
                 account.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER")));
         SecurityContext securityContext = SecurityContextHolder.getContext();
