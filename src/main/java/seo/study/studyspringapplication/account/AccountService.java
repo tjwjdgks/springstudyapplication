@@ -1,15 +1,15 @@
 package seo.study.studyspringapplication.account;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +17,10 @@ import seo.study.studyspringapplication.domain.Account;
 
 import java.util.List;
 
+// UserDetailsService bean이 하나만 있으면 SpringSecurity가 자동으로 이것을 사용한다
 @Service
 @RequiredArgsConstructor
-public class AccountService {
+public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
@@ -31,7 +32,7 @@ public class AccountService {
     public Account processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailToken();
-        sendEmailCheck(newAccount);
+        sendSignUpConfirmEmail(newAccount);
         return newAccount;
     }
     // save안에서 트랜잭션이므로 entity persist but 트랜잭션 나오면 detach 상태이므로 트랜잭션 상태를 유지해야한다
@@ -47,7 +48,7 @@ public class AccountService {
         return newAccount;
     }
 
-    private void sendEmailCheck(Account newAccount) {
+    public void sendSignUpConfirmEmail(Account newAccount) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(newAccount.getEmail());
         mailMessage.setSubject("스터디 가입인증 ");
@@ -73,5 +74,18 @@ public class AccountService {
 //        SecurityContext context = SecurityContextHolder.getContext();
 //        context.setAuthentication(authentication);
 
+    }
+    // form 로그인을 위해 UserDetailService 구현
+    @Override
+    public UserDetails loadUserByUsername(String emailOrNickname) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmail(emailOrNickname);
+        if(account == null){
+            account = accountRepository.findByNickname(emailOrNickname);
+        }
+        if(account == null)
+            throw new UsernameNotFoundException(emailOrNickname);
+
+        // principal 객체 넘겨 준다 현재는 User확장한 UserAccount
+        return new UserAccount(account) ;
     }
 }
