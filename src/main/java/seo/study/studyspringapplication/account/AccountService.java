@@ -14,11 +14,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.domain.Account;
+import seo.study.studyspringapplication.settings.Profile;
 
 import java.util.List;
 
 // UserDetailsService bean이 하나만 있으면 SpringSecurity가 자동으로 이것을 사용한다
 @Service
+@Transactional // traincation 없이 data 변경 하면 db 반영 안됨
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
@@ -28,7 +30,6 @@ public class AccountService implements UserDetailsService {
     // authenticationManager 빈으로 노출 되어 있지 않음(특정 설정 없이 빈으로 주입 못받는다)
     //private final AuthenticationManager authenticationManager;
 
-    @Transactional
     public Account processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailToken();
@@ -76,6 +77,7 @@ public class AccountService implements UserDetailsService {
 
     }
     // form 로그인을 위해 UserDetailService 구현
+    @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String emailOrNickname) throws UsernameNotFoundException {
         Account account = accountRepository.findByEmail(emailOrNickname);
@@ -87,5 +89,18 @@ public class AccountService implements UserDetailsService {
 
         // principal 객체 넘겨 준다 현재는 User확장한 UserAccount
         return new UserAccount(account) ;
+    }
+
+    public void completeSignUp(Account account) {
+        account.completeSignUp();
+        login(account);
+    }
+    // 영속성 detach 상태를 save를 호출하여 persistence 상태로 전환하여 data 저장한다
+    public void updateProfile(Account account, Profile profile) {
+         account.setUrl(profile.getUrl());
+         account.setOccupation(profile.getOccupation());
+         account.setBio(profile.getBio());
+         account.setLocation(profile.getLocation());
+         accountRepository.save(account);
     }
 }

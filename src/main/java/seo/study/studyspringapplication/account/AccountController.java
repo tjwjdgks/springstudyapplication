@@ -60,8 +60,7 @@ public class AccountController {
             return view;
         }
 
-        account.completeSignUp();
-        accountService.login(account);
+        accountService.completeSignUp(account);
         model.addAttribute("numberOfUser",accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
 
@@ -73,7 +72,7 @@ public class AccountController {
         return "account/check-email";
     }
     @GetMapping("/resend-confirm-email")
-    public String resendConfirmEmal(@CurrentUser Account account, Model model){
+    public String resendConfirmEmail(@CurrentUser Account account, Model model){
         if(!account.canSendConfirmEmail()){
             model.addAttribute("error","인증 이메일은 1시간에 한번만 전송할 수 있습니다");
             model.addAttribute("email",account.getEmail());
@@ -81,5 +80,16 @@ public class AccountController {
         }
         accountService.sendSignUpConfirmEmail(account);
         return "redirect:/";
+    }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account){
+        Account byNickname = accountRepository.findByNickname(nickname);
+        if(byNickname == null){
+            throw  new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다");
+        }
+        model.addAttribute("account",byNickname); // name 주지 않으면 해당 객체 class 이름에 camelcase 사용한다
+        model.addAttribute("isOwner",byNickname.equals(account));
+        return "account/profile";
     }
 }

@@ -19,6 +19,7 @@
         </div>
 
         <form class="needs-validation col-sm-6" action="#" th:action="@{/login}" method="post" novalidate>
+            <!--아이디 default name = username 비밀번호 default name =  password -->
             <div class="form-group">
                 <label for="username">이메일 또는 닉네임</label>
                 <input id="username" type="text" name="username" class="form-control"
@@ -38,6 +39,12 @@
                 <small class="invalid-feedback">패스워드를 입력하세요.</small>
             </div>
 
+            <!-- remember me도 기본으로 정해진 paramter 값이 있다 name= remember-me -->
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me" checked>
+                <label class ="form-check-label" for="rememberMe" aria-describedby="rememberMeHelp">로그인 유지</label>
+            </div>
+
             <div class="form-group">
                 <button class="btn btn-success btn-block" type="submit"
                         aria-describedby="submitHelp">로그인</button>
@@ -45,6 +52,8 @@
                     스터디에 처음 오신거라면 <a href="#" th:href="@{/signup}">계정을 먼저 만드세요.</a>
                 </small>
             </div>
+
+
         </form>
     </div>
 
