@@ -21,10 +21,13 @@ public class Profile {
     @Length(max = 50)
     private String location;
 
+    private String profileImage;
+
     public Profile(Account account) {
         this.bio = account.getBio();
         this.location = account.getLocation();
         this.url = account.getUrl();
+        this.profileImage = account.getProfileImage();
         this.occupation = account.getOccupation();
     }
 }
