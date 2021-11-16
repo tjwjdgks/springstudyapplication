@@ -1,7 +1,8 @@
-package seo.study.studyspringapplication.settings;
+package seo.study.studyspringapplication.settings.vaildator;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import seo.study.studyspringapplication.settings.form.PasswordForm;
 
 public class PasswordFormValidator implements Validator {
     @Override

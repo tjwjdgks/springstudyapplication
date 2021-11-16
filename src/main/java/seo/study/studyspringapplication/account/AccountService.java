@@ -1,6 +1,8 @@
 package seo.study.studyspringapplication.account;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.NameTokenizers;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.domain.Account;
-import seo.study.studyspringapplication.settings.Profile;
+import seo.study.studyspringapplication.settings.form.NicknameForm;
+import seo.study.studyspringapplication.settings.form.Notifications;
+import seo.study.studyspringapplication.settings.form.Profile;
 
 import java.util.List;
 
@@ -23,9 +27,11 @@ import java.util.List;
 @Transactional // traincation 없이 data 변경 하면 db 반영 안됨
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
+
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     // authenticationManager 빈으로 노출 되어 있지 않음(특정 설정 없이 빈으로 주입 못받는다)
     //private final AuthenticationManager authenticationManager;
@@ -42,6 +48,7 @@ public class AccountService implements UserDetailsService {
                 .email(signUpForm.getEmail())
                 .nickname(signUpForm.getNickname())
                 .password(passwordEncoder.encode(signUpForm.getPassword())) // password  encoding 해야함
+                .studyCreatedByWeb(true)
                 .studyEnrollmentResultByWeb(true)
                 .studyUpdatedByWeb(true)
                 .build();
@@ -97,16 +104,40 @@ public class AccountService implements UserDetailsService {
     }
     // 영속성 detach 상태를 save를 호출하여 persistence 상태로 전환하여 data 저장한다
     public void updateProfile(Account account, Profile profile) {
-         account.setUrl(profile.getUrl());
-         account.setOccupation(profile.getOccupation());
-         account.setBio(profile.getBio());
-         account.setLocation(profile.getLocation());
-         account.setProfileImage(profile.getProfileImage());
-         accountRepository.save(account);
+        //source data를 destination으로 복사
+        //source와 dist 이름 일치해야 함
+        modelMapper.map(profile,account);
+        accountRepository.save(account);
     }
 
     public void updatePassword(Account account, String newPassword) {
         account.setPassword(passwordEncoder.encode(newPassword));
         accountRepository.save(account);
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+        // 기본 modelMapper가 이해할 수 있도록 설정해주어야 한다
+        // modelMapper는 유사한 이름도 저장하는 기능
+        modelMapper.getConfiguration()
+                .setSourceNameTokenizer(NameTokenizers.UNDERSCORE)
+                .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE);
+        modelMapper.map(notifications,account);
+        accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, NicknameForm nicknameForm) {
+        modelMapper.map(nicknameForm,account);
+        accountRepository.save(account);
+        login(account);
+    }
+
+    public void sendLoginLink(Account account) {
+        account.generateEmailToken();
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(account.getEmail());
+        mailMessage.setSubject("스터디, 로그인 링크");
+        mailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken() +
+                "&email=" + account.getEmail());
+        javaMailSender.send(mailMessage);
     }
 }

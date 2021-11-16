@@ -1,4 +1,4 @@
-package seo.study.studyspringapplication.settings;
+package seo.study.studyspringapplication.settings.form;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;

@@ -16,10 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.domain.Account;
 
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -119,5 +123,37 @@ class AccountControllerTest {
         assertNotNull(account.getEmailCheckToken());
         assertTrue(accountRepository.existsByEmail("tjwjdgks@naver.com"));
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
+    }
+
+    @DisplayName("이메일로 로그인 폼")
+    @Test
+    public void login_by_emailForm() throws Exception {
+        mockMvc.perform(get("/email-login"))
+                .andExpect(status().isOk());
+
+    }
+    @DisplayName("이메일로 로그인 메일 보내기 - 전송 성공")
+    @Test
+    public void login_by_email_success() throws Exception{
+
+        Account account = Account.builder().nickname("test").email("test@test.com").password("12345678")
+                .emailTokenGeneratedAt(LocalDateTime.now().minusHours(1)).build();
+        Account save = accountRepository.save(account);
+        mockMvc.perform(post("/email-login").param("email",save.getEmail()).with(csrf()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("message"));
+    }
+    @DisplayName("이메일로 로그인 메일 보내기 - 전송 실패")
+    @Test
+    public void login_by_email_fail() throws Exception{
+
+        Account account = Account.builder().nickname("test").email("test@test.com").password("12345678")
+                .emailTokenGeneratedAt(LocalDateTime.now().minusHours(1)).build();
+        Account save = accountRepository.save(account);
+        mockMvc.perform(post("/email-login").param("email",save.getEmail()).with(csrf()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("message"));
     }
 }

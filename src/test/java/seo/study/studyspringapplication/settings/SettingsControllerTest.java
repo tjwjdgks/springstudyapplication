@@ -19,8 +19,7 @@ import seo.study.studyspringapplication.account.AccountService;
 import seo.study.studyspringapplication.account.SignUpForm;
 import seo.study.studyspringapplication.domain.Account;
 
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -156,9 +155,77 @@ class SettingsControllerTest {
     }
 
     @WithAccount("test")
-    @DisplayName("패스워드 수정 - 입력값 에러")
+    @DisplayName("알람 수정 폼")
     @Test
-    public void updatePassword_error(){
+    public void updateNotificationsForm() throws Exception{
+        mockMvc.perform(get("/settings/notifications")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("notifications"));
+    }
+    @WithAccount("test")
+    @DisplayName("알람 수정")
+    @Test
+    public void updateNotifications() throws Exception {
+        mockMvc.perform(post("/settings/notifications")
+                        .param("studyCreatedByEmail","true")
+                        .param("studyCreatedByWeb","true")
+                        .param("studyEnrollmentResultByEmail","true")
+                        .param("studyEnrollmentResultByWeb","true")
+                        .param("studyUpdatedByEmail","true")
+                        .param("studyUpdatedByWeb","true")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/settings/notifications"))
+                .andExpect(flash().attributeExists("message"));
+
+        Account test = accountRepository.findByNickname("test");
+        assertAll(
+                ()-> assertTrue(test.isStudyCreatedByEmail()),
+                ()-> assertTrue(test.isStudyCreatedByWeb()),
+                ()-> assertTrue(test.isStudyEnrollmentResultByEmail()),
+                ()-> assertTrue(test.isStudyEnrollmentResultByWeb()),
+                ()-> assertTrue(test.isStudyUpdatedByEmail()),
+                ()-> assertTrue(test.isStudyUpdatedByWeb())
+        );
+    }
+    @WithAccount("test")
+    @DisplayName("닉네임 수정 폼")
+    @Test
+    public void updateAccountForm() throws Exception {
+        mockMvc.perform(get("/settings/account").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("nicknameForm"));
+
+    }
+    @WithAccount("test")
+    @DisplayName("닉네임 변경 정상")
+    @Test
+    public void updateAccount() throws Exception {
+        mockMvc.perform(post("/settings/account")
+                        .param("nickname","testtest")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/settings/account"))
+                .andExpect(flash().attributeExists("message"));
+
+        assertNotNull(accountRepository.findByNickname("testtest"));
+    }
+    @WithAccount("test")
+    @DisplayName("닉네임 변경 오류")
+    @Test
+    public void updateAccount_fail() throws Exception {
+        mockMvc.perform(post("/settings/account")
+                        .param("nickname","1")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/account"))
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().hasErrors());
+
+        assertNull(accountRepository.findByNickname("1"));
 
     }
 }
