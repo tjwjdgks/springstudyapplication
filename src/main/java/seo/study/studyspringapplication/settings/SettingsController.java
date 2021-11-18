@@ -1,27 +1,33 @@
 package seo.study.studyspringapplication.settings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import seo.study.studyspringapplication.account.AccountService;
 import seo.study.studyspringapplication.account.CurrentUser;
 import seo.study.studyspringapplication.domain.Account;
-import seo.study.studyspringapplication.settings.form.NicknameForm;
-import seo.study.studyspringapplication.settings.form.Notifications;
-import seo.study.studyspringapplication.settings.form.PasswordForm;
-import seo.study.studyspringapplication.settings.form.Profile;
+import seo.study.studyspringapplication.domain.Tag;
+import seo.study.studyspringapplication.domain.Zone;
+import seo.study.studyspringapplication.settings.form.*;
 import seo.study.studyspringapplication.settings.vaildator.NicknameValidator;
 import seo.study.studyspringapplication.settings.vaildator.PasswordFormValidator;
+import seo.study.studyspringapplication.tag.TagRepository;
+import seo.study.studyspringapplication.zone.ZoneRepository;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,7 +36,9 @@ public class SettingsController {
     private final AccountService accountService;
     private final ModelMapper modelMapper; // modelmapper
     private final NicknameValidator nicknameValidator;
-
+    private final TagRepository tagRepository;
+    private final ObjectMapper objectMapper;
+    private final ZoneRepository zoneRepository;
 
     @InitBinder("passwordForm")
     public void passwordFormInitBinder(WebDataBinder webDataBinder){
@@ -120,4 +128,78 @@ public class SettingsController {
         attributes.addFlashAttribute("message","닉네임을 수정했습니다.");
         return "redirect:/settings/account";
     }
+
+    @GetMapping("/settings/tags")
+    public String tagUpdateForm(@CurrentUser Account account, Model model) throws JsonProcessingException {
+        model.addAttribute(account);
+        Set<Tag> tags = accountService.getTags(account);
+        model.addAttribute("tags",tags.stream().map(t->t.getTitle()).collect(Collectors.toList()));
+
+        List<String> allTags = tagRepository.findAll().stream().map(t -> t.getTitle()).collect(Collectors.toList());
+        // list to json ObjectMapper 사용하면 된다
+        model.addAttribute("whitelist",objectMapper.writeValueAsString(allTags));
+        return "settings/tags";
+    }
+
+    @PostMapping("/settings/tags/add")
+    @ResponseBody
+    public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm){
+        String title = tagForm.getTagTitle();
+        Tag tag = tagRepository.findByTitle(title);
+        if(tag == null) {
+            tag = tagRepository.save(Tag.builder().title(tagForm.getTagTitle()).build());
+        }
+
+        accountService.addTag(account,tag);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/settings/tags/remove")
+    @ResponseBody
+    public ResponseEntity removeTag(@CurrentUser Account account, @RequestBody TagForm tagForm){
+        String title = tagForm.getTagTitle();
+        Tag tag = tagRepository.findByTitle(title);
+        if(tag == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        accountService.removeTag(account,tag);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/settings/zones")
+    public String zonesUpdateForm(@CurrentUser Account account, Model model) throws JsonProcessingException {
+        model.addAttribute(account);
+
+        Set<Zone> zones = accountService.getZones(account);
+        model.addAttribute("zones",zones.stream().map(Zone::toString).collect(Collectors.toList()));
+
+        List<String> allZones = zoneRepository.findAll().stream().map(Zone::toString).collect(Collectors.toList());
+        model.addAttribute("whitelist",objectMapper.writeValueAsString(allZones));
+
+        return "/settings/zones";
+    }
+
+    @ResponseBody
+    @PostMapping("/settings/zones/add")
+    public ResponseEntity addZone(@CurrentUser Account account, @RequestBody ZoneForm zoneForm){
+
+        Zone zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(),zoneForm.getProvinceName());
+        if(zone == null){
+            return ResponseEntity.badRequest().build();
+        }
+        accountService.addZone(account,zone);
+        return ResponseEntity.ok().build();
+    }
+    @ResponseBody
+    @PostMapping("/settings/zones/remove")
+    public ResponseEntity removeZone(@CurrentUser Account account, @RequestBody ZoneForm zoneForm){
+        Zone zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(),zoneForm.getProvinceName());
+        if(zone == null)
+            return ResponseEntity.badRequest().build();
+
+        accountService.removeZone(account,zone);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }
