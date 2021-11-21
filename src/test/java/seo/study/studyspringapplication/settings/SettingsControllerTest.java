@@ -314,7 +314,7 @@ class SettingsControllerTest {
     @Test
     public void updateZonesForm() throws Exception {
         mockMvc.perform(get("/settings/zones"))
-                .andExpect(view().name("setting/zones"))
+                .andExpect(view().name("settings/zones"))
                 .andExpect(model().attributeExists("account"))
                 .andExpect(model().attributeExists("whitelist"))
                 .andExpect(model().attributeExists("zones"));

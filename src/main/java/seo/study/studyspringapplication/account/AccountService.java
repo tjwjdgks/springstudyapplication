@@ -1,10 +1,12 @@
 package seo.study.studyspringapplication.account;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NameTokenizers;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,27 +17,37 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import seo.study.studyspringapplication.config.AppProperties;
 import seo.study.studyspringapplication.domain.Account;
 import seo.study.studyspringapplication.domain.Tag;
 import seo.study.studyspringapplication.domain.Zone;
+import seo.study.studyspringapplication.mail.EmailMessage;
+import seo.study.studyspringapplication.mail.EmailService;
 import seo.study.studyspringapplication.settings.form.NicknameForm;
 import seo.study.studyspringapplication.settings.form.Notifications;
 import seo.study.studyspringapplication.settings.form.Profile;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 // UserDetailsService bean이 하나만 있으면 SpringSecurity가 자동으로 이것을 사용한다
+@Slf4j
 @Service
 @Transactional // traincation 없이 data 변경 하면 db 반영 안됨
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
-    private final JavaMailSender javaMailSender;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final TemplateEngine templateEngine; // thymeleaf
+    private final AppProperties appProperties;
 
     // authenticationManager 빈으로 노출 되어 있지 않음(특정 설정 없이 빈으로 주입 못받는다)
     //private final AuthenticationManager authenticationManager;
@@ -54,12 +66,23 @@ public class AccountService implements UserDetailsService {
     }
 
     public void sendSignUpConfirmEmail(Account newAccount) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newAccount.getEmail());
-        mailMessage.setSubject("스터디 가입인증 ");
-        mailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken()
+        Context context = new Context();
+        context.setVariable("link","/check-email-token?token=" + newAccount.getEmailCheckToken()
                 +"&email="+ newAccount.getEmail());
-        javaMailSender.send(mailMessage);
+        context.setVariable("nickname",newAccount.getNickname());
+        context.setVariable("linkName","이메일 인증하기");
+        context.setVariable("message","서비스를 사용하려면 링크를 클릭하세요");
+        context.setVariable("host",appProperties.getHost());
+
+        String message = templateEngine.process("mail/simple-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(newAccount.getEmail())
+                .subject("스터디 가입인증 ")
+                .message(message)
+                .build();
+
+        emailService.sendEmail(emailMessage);
     }
 
     public void login(Account account) {
@@ -129,13 +152,24 @@ public class AccountService implements UserDetailsService {
     }
 
     public void sendLoginLink(Account account) {
-        account.generateEmailToken();
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(account.getEmail());
-        mailMessage.setSubject("스터디, 로그인 링크");
-        mailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken() +
+
+        Context context = new Context();
+        context.setVariable("link","/login-by-email?token=" + account.getEmailCheckToken() +
                 "&email=" + account.getEmail());
-        javaMailSender.send(mailMessage);
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("linkName","이메일로 로그인하기");
+        context.setVariable("message","로그인 하려면 링크를 클릭하세요");
+        context.setVariable("host",appProperties.getHost());
+
+        String message = templateEngine.process("mail/simple-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(account.getEmail())
+                .subject("스터디 가입인증 ")
+                .message(message)
+                .build();
+
+        emailService.sendEmail(emailMessage);
     }
 
     // account가 detach 객체이므로 persistence 상태로 만들어야 한다. account 로딩 해야된다.

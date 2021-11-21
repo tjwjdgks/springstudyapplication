@@ -175,7 +175,7 @@ public class SettingsController {
         List<String> allZones = zoneRepository.findAll().stream().map(Zone::toString).collect(Collectors.toList());
         model.addAttribute("whitelist",objectMapper.writeValueAsString(allZones));
 
-        return "/settings/zones";
+        return "settings/zones";
     }
 
     @ResponseBody

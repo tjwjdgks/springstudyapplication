@@ -35,3 +35,7 @@ build/
 ### NPM ###
 src/main/resources/static/node_modules
 src/main/resources/static/node
+
+### application properties ###
+src/main/resources/application.properties
+src/main/resources/application-dev.properties

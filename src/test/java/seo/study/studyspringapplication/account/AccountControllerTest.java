@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.domain.Account;
+import seo.study.studyspringapplication.mail.EmailMessage;
+import seo.study.studyspringapplication.mail.EmailService;
 
 
 import java.time.LocalDateTime;
@@ -43,7 +45,7 @@ class AccountControllerTest {
     private AccountRepository accountRepository;
 
     @MockBean
-    JavaMailSender javaMailSender;
+    EmailService emailService;
 
     @DisplayName("인증 메일 확인 - 입력값 오류")
     @Test
@@ -122,7 +124,7 @@ class AccountControllerTest {
         assertNotEquals(account.getPassword(),"12345678");
         assertNotNull(account.getEmailCheckToken());
         assertTrue(accountRepository.existsByEmail("tjwjdgks@naver.com"));
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().sendEmail(any(EmailMessage.class));
     }
 
     @DisplayName("이메일로 로그인 폼")
