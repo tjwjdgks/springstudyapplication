@@ -1,40 +1,31 @@
 package seo.study.studyspringapplication.settings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.With;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.WithAccount;
 import seo.study.studyspringapplication.account.AccountRepository;
 import seo.study.studyspringapplication.account.AccountService;
-import seo.study.studyspringapplication.account.SignUpForm;
 import seo.study.studyspringapplication.domain.Account;
 import seo.study.studyspringapplication.domain.Tag;
 import seo.study.studyspringapplication.domain.Zone;
-import seo.study.studyspringapplication.settings.form.TagForm;
-import seo.study.studyspringapplication.settings.form.ZoneForm;
+import seo.study.studyspringapplication.tag.TagForm;
+import seo.study.studyspringapplication.zone.ZoneForm;
 import seo.study.studyspringapplication.tag.TagRepository;
 import seo.study.studyspringapplication.zone.ZoneRepository;
-
-import java.io.IOException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

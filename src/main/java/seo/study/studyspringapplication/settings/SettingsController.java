@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -20,12 +19,14 @@ import seo.study.studyspringapplication.domain.Zone;
 import seo.study.studyspringapplication.settings.form.*;
 import seo.study.studyspringapplication.settings.vaildator.NicknameValidator;
 import seo.study.studyspringapplication.settings.vaildator.PasswordFormValidator;
+import seo.study.studyspringapplication.tag.TagForm;
 import seo.study.studyspringapplication.tag.TagRepository;
+import seo.study.studyspringapplication.tag.TagService;
+import seo.study.studyspringapplication.zone.ZoneForm;
 import seo.study.studyspringapplication.zone.ZoneRepository;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class SettingsController {
     private final TagRepository tagRepository;
     private final ObjectMapper objectMapper;
     private final ZoneRepository zoneRepository;
+    private final TagService tagService;
 
     @InitBinder("passwordForm")
     public void passwordFormInitBinder(WebDataBinder webDataBinder){
@@ -145,11 +147,7 @@ public class SettingsController {
     @ResponseBody
     public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm){
         String title = tagForm.getTagTitle();
-        Tag tag = tagRepository.findByTitle(title);
-        if(tag == null) {
-            tag = tagRepository.save(Tag.builder().title(tagForm.getTagTitle()).build());
-        }
-
+        Tag tag = tagService.findOrCreateNew(title);
         accountService.addTag(account,tag);
         return ResponseEntity.ok().build();
     }

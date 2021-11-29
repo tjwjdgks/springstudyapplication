@@ -1,4 +1,4 @@
-package seo.study.studyspringapplication.settings.form;
+package seo.study.studyspringapplication.zone;
 
 import lombok.Data;
 import seo.study.studyspringapplication.domain.Zone;

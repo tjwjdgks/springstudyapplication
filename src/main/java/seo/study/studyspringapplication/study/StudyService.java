@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.domain.Account;
 import seo.study.studyspringapplication.domain.Study;
+import seo.study.studyspringapplication.domain.Tag;
+import seo.study.studyspringapplication.domain.Zone;
 import seo.study.studyspringapplication.study.form.StudyDescriptionForm;
 
 @Service
@@ -25,17 +27,26 @@ public class StudyService {
     }
     public Study getStudyToUpdate(Account account, String path){
         Study study = this.getStudy(path);
+        checkIfManger(account, study);
+        return study;
+    }
+
+    private void checkIfManger(Account account, Study study) {
         if(!account.isManagerOf(study)){
             throw new AccessDeniedException("해당 기능을 사용할 수 없습니다");
         }
-        return study;
     }
+
     public Study getStudy(String path){
         Study study = this.repository.findByPath(path);
-        if(study == null){
-            throw new IllegalArgumentException(path+"에 해당하는 스터디가 없습니다");
-        }
+        checkIfExistingStudy(path, study);
         return study;
+    }
+
+    private void checkIfExistingStudy(String path, Study study) {
+        if(study == null){
+            throw new IllegalArgumentException(path +"에 해당하는 스터디가 없습니다");
+        }
     }
 
     public void updateStudyDescription(Study study, StudyDescriptionForm studyDescriptionForm) {
@@ -52,5 +63,34 @@ public class StudyService {
 
     public void updateStudyImage(Study study, String image) {
         study.setImage(image);
+    }
+
+    public void addTag(Study study, Tag tag) {
+        study.getTags().add(tag);
+    }
+
+    public void removeTag(Study study, Tag tag) {
+        study.getTags().remove(tag);
+    }
+    public void addZone(Study study, Zone zone){
+        study.getZones().add(zone);
+    }
+
+    public void removeZone(Study study, Zone zone) {
+        study.getZones().remove(zone);
+    }
+
+    public Study getStudyToUpdateTag(Account account, String path) {
+        Study study = repository.findAccountWithTagsByPath(path);
+        checkIfExistingStudy(path,study);
+        checkIfManger(account,study);
+        return study;
+    }
+
+    public Study getStudyToUpdateZone(Account account, String path) {
+        Study study = repository.findAccountWithZonesByPath(path);
+        checkIfExistingStudy(path,study);
+        checkIfManger(account,study);
+        return study;
     }
 }

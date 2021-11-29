@@ -12,4 +12,10 @@ public interface StudyRepository extends JpaRepository<Study,Long> {
     // fetch : 선언 Eager 나머지 lazy
     @EntityGraph(value = "Study.withAll",type = EntityGraph.EntityGraphType.LOAD)
     Study findByPath(String path);
+
+    @EntityGraph(value = "Study.withTagAndManger", type = EntityGraph.EntityGraphType.LOAD)
+    Study findAccountWithTagsByPath(String path);
+
+    @EntityGraph(value = "Study.withZoneAndManger", type = EntityGraph.EntityGraphType.LOAD)
+    Study findAccountWithZonesByPath(String path);
 }

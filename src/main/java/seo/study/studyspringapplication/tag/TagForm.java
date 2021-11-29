@@ -1,4 +1,4 @@
-package seo.study.studyspringapplication.settings.form;
+package seo.study.studyspringapplication.tag;
 
 import lombok.Data;
 
