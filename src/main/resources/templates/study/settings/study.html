@@ -85,6 +85,25 @@
                             </form>
                         </div>
 
+                        <div class="row pt-3" th:if="${!study.closed}">
+                            <hr>
+                            <h5 class="col-sm-12">스터디 이름</h5>
+                            <form class="col-sm-12 needs-validation" action="#" th:action="@{'/study/'+${study.getPath()}+'/settings/study/title'}" method="post" novalidate>
+                                <div class="alert alert-warning" role="alert">
+                                    스터디 이름을 수정합니다. <br/>
+                                </div>
+                                <!-- neme 속성으로 서버에 전송될 데이터 이름을 지정 -->
+                                <div>
+                                    <input id="title" type="text" name="newTitle" th:value="${study.title}" class="form-control"
+                                           placeholder="스터디 이름" aria-describedby="titleHelp" required>
+                                    <small id="titleHelp" class="form-text text-muted">스터디 이름을 50자 이내로 입력하세요.</small>
+                                    <small class="invalid-feedback">스터디 이름을 입력하세요.</small>
+                                    <small class="form-text text-danger" th:if="${studyTitleError}" th:text="${studyTitleError}">Path Error</small>
+                                </div>
+                                <button class="btn btn-outline-primary" type="submit" aria-describedby="submitHelp"> 스터디 이름 수정</button>
+                            </form>
+                        </div>
+
                         <div class="row pt-3" th:if="${study.isRemovable()}">
                             <hr>
                             <h5 class="col-sm-12">스터디 삭제</h5>

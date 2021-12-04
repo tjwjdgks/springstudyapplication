@@ -43,7 +43,11 @@
 
     * validate 할때 model에 검증 객체와 error가 담긴다 DataBinder 해준다다
 
+   * 객체의 상태를 변경하는 것 -> post mapping
    * 비즈니스 로직 차원에서 고민해야 것
         ui에서 노출하는 정보와 서버에서 처리하는 에러처리가 어느 정도 일치해야 한다.
             ui로 접근하지 못하게 막았을 때 악의적인 사용자가 접근할 경우 bad request
             ui로 접근가능 하지만 비즈니스 로직에 어긋나는 경우 경우 예외 처리
+
+
+   * 문자열 String aa = ".." 등의 선언은 리터럴 방식, immutable, String Object이다

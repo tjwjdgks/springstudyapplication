@@ -63,7 +63,7 @@ public class StudySettingController {
 
         studyService.updateStudyDescription(study, studyDescriptionForm);
         redirectAttributes.addFlashAttribute("message","스터디 소개를 수정했습니다");
-        return "redirect:/study/"+getPath(path)+"/settings/description";
+        return "redirect:/study/"+study.getEncodePath(path)+"/settings/description";
 
     }
     @GetMapping("/banner")
@@ -79,19 +79,19 @@ public class StudySettingController {
         Study study = studyService.getStudyToUpdate(account, path);
         studyService.updateStudyImage(study,image);
         redirectAttributes.addFlashAttribute("message", "스터디 이미지를 수정했습니다.");
-        return "redirect:/study/" + getPath(path) + "/settings/banner";
+        return "redirect:/study/" + study.getEncodePath(path) + "/settings/banner";
     }
     @PostMapping("/banner/enable")
     public String enableStudyBanner(@CurrentUser Account account,@PathVariable String path){
         Study study = studyService.getStudyToUpdate(account, path);
         studyService.enableStudyBanner(study);
-        return "redirect:/study/" + getPath(path) + "/settings/banner";
+        return "redirect:/study/" + study.getEncodePath(path) + "/settings/banner";
     }
     @PostMapping("/banner/disable")
     public String disableStudyBanner(@CurrentUser Account account,@PathVariable String path){
         Study study = studyService.getStudyToUpdate(account, path);
         studyService.disableStudyBanner(study);
-        return "redirect:/study/" + getPath(path) + "/settings/banner";
+        return "redirect:/study/" + study.getEncodePath(path) + "/settings/banner";
     }
     @GetMapping("/tags")
     public String studyTagForm(@CurrentUser Account account, @PathVariable String path, Model model) throws JsonProcessingException {
@@ -168,36 +168,36 @@ public class StudySettingController {
         Study study = studyService.getStudyToUpdateStatus(account, path);
         studyService.publish(study);
         attributes.addFlashAttribute("message","스터디를 공개했습니다.");
-        return "redirect:/study/" +getPath(path) + "/settings/study";
+        return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
     }
     @PostMapping("/study/close")
     public String updateStudyClose(@CurrentUser Account account, @PathVariable String path,RedirectAttributes attributes){
         Study study = studyService.getStudyToUpdateStatus(account, path);
         studyService.close(study);
         attributes.addFlashAttribute("message","스터디를 종료했습니다");
-        return "redirect:/study/" +getPath(path) + "/settings/study";
+        return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
     }
     @PostMapping("/recruit/start")
     public String startRecuit(@CurrentUser Account account, @PathVariable String path, RedirectAttributes attributes){
         Study study = studyService.getStudyToUpdateStatus(account,path);
         if(!study.canUpdateRecruiting()){
             attributes.addFlashAttribute("message","1시간 안에 인원 모집 설정을 여러번 변경할 수 없습니다.");
-            return "redirect:/study/" +getPath(path) + "/settings/study";
+            return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
         }
         studyService.startRecruit(study);
         attributes.addFlashAttribute("message","인원 모집을 시작합니다.");
-        return "redirect:/study/" +getPath(path) + "/settings/study";
+        return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
     }
     @PostMapping("/recruit/stop")
     public String stopRecuit(@CurrentUser Account account, @PathVariable String path, RedirectAttributes attributes){
         Study study = studyService.getStudyToUpdateStatus(account,path);
         if(!study.canUpdateRecruiting()){
             attributes.addFlashAttribute("message","1시간 안에 인원 모집 설정을 여러번 변경할 수 없습니다.");
-            return "redirect:/study/" +getPath(path) + "/settings/study";
+            return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
         }
         studyService.stopRecruit(study);
         attributes.addFlashAttribute("message","인원 모집을 종료합니다.");
-        return "redirect:/study/" +getPath(path) + "/settings/study";
+        return "redirect:/study/" +study.getEncodePath(path) + "/settings/study";
     }
     @PostMapping("/study/path")
     public String updateStudyPath(@CurrentUser Account account, @PathVariable String path, String newPath, RedirectAttributes attributes, Model model){
@@ -210,7 +210,7 @@ public class StudySettingController {
         }
         studyService.updateStudyPath(study,newPath);
         attributes.addFlashAttribute("message", "스터디 경로를 수정했습니다.");
-        return "redirect:/study/" + getPath(newPath) + "/settings/study";
+        return "redirect:/study/" + study.getEncodePath(newPath) + "/settings/study";
     }
     @PostMapping("/study/title")
     public String updateStudyTitle(@CurrentUser Account account, @PathVariable String path, String newTitle, RedirectAttributes attributes, Model model){
@@ -223,16 +223,13 @@ public class StudySettingController {
         }
         studyService.updateStudyTitle(study,newTitle);
         attributes.addFlashAttribute("message", "스터디 이름을 수정했습니다.");
-        return "redirect:/study/" + getPath(path) + "/settings/study";
+        return "redirect:/study/" + study.getEncodePath(path) + "/settings/study";
     }
     @PostMapping("/study/remove")
     public String removeStudy(@CurrentUser Account account, @PathVariable String path){
         Study study = studyService.getStudyToUpdateStatus(account,path);
         studyService.remove(study);
         return "redirect:/";
-    }
-    private String getPath(String path){
-        return URLEncoder.encode(path, StandardCharsets.UTF_8);
     }
 
 }

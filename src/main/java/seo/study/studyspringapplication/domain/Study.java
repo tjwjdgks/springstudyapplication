@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import seo.study.studyspringapplication.account.UserAccount;
 
 import javax.persistence.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +25,9 @@ import java.util.Set;
         @NamedAttributeNode("managers")})
 @NamedEntityGraph(name="Study.withManagers", attributeNodes = {
         @NamedAttributeNode("managers")
+})
+@NamedEntityGraph(name="Study.withMembers",attributeNodes = {
+        @NamedAttributeNode("members")
 })
 @Entity
 @Setter @Getter @EqualsAndHashCode(of = "id")
@@ -74,6 +79,7 @@ public class Study {
     public void addManager(Account account) {
         this.managers.add(account);
     }
+
     public boolean isJoinable(UserAccount userAccount){
         Account account = userAccount.getAccount();
         return this.isPublished() && this.isRecruiting()
@@ -139,4 +145,15 @@ public class Study {
     public boolean isRemovable() {
         return !this.published;
     }
+
+    public void addMember(Account account) {
+        this.getMembers().add(account);
+    }
+    public void removeMember(Account account) {
+        this.getMembers().remove(account);
+    }
+    public String getEncodePath(String path){
+        return URLEncoder.encode(path, StandardCharsets.UTF_8);
+    }
+
 }
