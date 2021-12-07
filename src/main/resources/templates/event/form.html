@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html::head"></head>
+<body class="bg-light">
+    <nav th:replace="fragments.html::main-nav"></nav>
+    <div th:replace="fragments.html::study-banner"></div>
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2><a th:href="@{'/study/'+ ${study.path}}"><span th:text="${study.title}">스터디</span></a>/ 새모임 만들기</h2>
+        </div>
+        <div class="row justify-content-center">
+            <form class="needs-validation col-sm-10" th:action="@{'/study/'+ ${study.path} + '/new-event'}"
+            th:object="${eventForm}" method="post" novalidate>
+                <div>
+                    <label for="title">모임 이름</label>
+                    <input id="title" type="text" th:field="*{title}" class="form-control" placeholder="모임 이름"
+                    aria-describedby="titleHelp" required>
+                    <small id="titleHelp" class="form-text text-muted">
+                        모임 이름을 50자 이내로 입력하세요
+                    </small>
+                    <small class="invalid-feedback">모임 이름을 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Error </small>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:replace="fragments.html::form-validation"></script>
+</body>
+</html>
