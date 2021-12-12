@@ -3,6 +3,7 @@ package seo.study.studyspringapplication.event.form;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
+import seo.study.studyspringapplication.account.UserAccount;
 import seo.study.studyspringapplication.domain.EventType;
 
 import javax.validation.constraints.Min;
@@ -16,7 +17,7 @@ public class EventForm {
     @Length(max = 50)
     private String title;
 
-    private String desciption;
+    private String description;
 
     private EventType eventType = EventType.FCFS;
 

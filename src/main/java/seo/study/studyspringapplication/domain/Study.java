@@ -155,5 +155,4 @@ public class Study {
     public String getEncodePath(String path){
         return URLEncoder.encode(path, StandardCharsets.UTF_8);
     }
-
 }
