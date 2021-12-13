@@ -1,16 +1,11 @@
 package seo.study.studyspringapplication.runner;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.stereotype.Component;
-import seo.study.studyspringapplication.aop.TimeTest;
-import seo.study.studyspringapplication.service.TestService;
-
-import java.util.List;
+import seo.study.studyspringapplication.runner.service.TestService;
 
 @Component
 public class AOPTest implements ApplicationRunner {
