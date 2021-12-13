@@ -89,8 +89,11 @@ public class StudyService {
         checkIfManger(account,study);
         return study;
     }
-
-
+    public Study getStudyToEnroll(String path) {
+        Study study = repository.findOnlyStudyByPath(path);
+        checkIfExistingStudy(path, study);
+        return study;
+    }
     private void checkIfManger(Account account, Study study) {
         if(!account.isManagerOf(study)){
             throw new AccessDeniedException("해당 기능을 사용할 수 없습니다");
@@ -152,4 +155,5 @@ public class StudyService {
     public void removeMember(Study study, Account account) {
         study.removeMember(account);
     }
+
 }

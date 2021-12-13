@@ -1,6 +1,7 @@
 package seo.study.studyspringapplication.config;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.NameTokenizers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -16,6 +17,14 @@ public class AppConfig {
     }
     @Bean
     public ModelMapper modelMapper(){
-        return new ModelMapper();
+
+        // 기본 modelMapper가 이해할 수 있도록 설정해주어야 한다
+        // modelMapper는 유사한 이름도 저장하는 기능 //  default의 경우 네이밍 컨벤션 모두 적용하기 때문에 UNDERSCORE 만 적용 하도록 변경
+        // http://modelmapper.org/user-manual/configuration/#matching-strategies
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setSourceNameTokenizer(NameTokenizers.UNDERSCORE)
+                .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE);
+        return modelMapper;
     }
 }

@@ -117,9 +117,9 @@
                             <span th:if="${!enroll.accepted}">대기중</span>
                         </td>
                         <td th:if="${study.isManager(#authentication.principal)}">
-                            <a th:if="${event.isAcceptable(enroll)}" href="#" class="text-decoration-none"
+                            <a th:if="${event.canAcceptable(enroll)}" href="#" class="text-decoration-none"
                                th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/accept'}" >신청 수락</a>
-                            <a th:if="${event.isRejectable(enroll)}" href="#" class="text-decoration-none"
+                            <a th:if="${event.canRejectable(enroll)}" href="#" class="text-decoration-none"
                                th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/reject'}">취소</a>
                         </td>
                         <td th:if="${study.isManager(#authentication.principal)}">

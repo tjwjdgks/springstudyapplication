@@ -38,7 +38,7 @@ import java.util.Set;
 // UserDetailsService bean이 하나만 있으면 SpringSecurity가 자동으로 이것을 사용한다
 @Slf4j
 @Service
-@Transactional // traincation 없이 data 변경 하면 db 반영 안됨
+@Transactional // entity detach 상태 일때 traincation 없이 data 변경 하면 db 반영 안됨
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
 
@@ -136,11 +136,6 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateNotifications(Account account, Notifications notifications) {
-        // 기본 modelMapper가 이해할 수 있도록 설정해주어야 한다
-        // modelMapper는 유사한 이름도 저장하는 기능
-        modelMapper.getConfiguration()
-                .setSourceNameTokenizer(NameTokenizers.UNDERSCORE)
-                .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE);
         modelMapper.map(notifications,account);
         accountRepository.save(account);
     }

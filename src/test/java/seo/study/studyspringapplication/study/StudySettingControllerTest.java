@@ -207,7 +207,7 @@ class StudySettingControllerTest {
     public void studyTagRemove() throws Exception{
         TagForm tagForm = new TagForm();
         tagForm.setTagTitle("test");
-        Tag tag = modelMapper.map(tagForm, Tag.class);
+        Tag tag = Tag.builder().title("test").build();
         Study test = studyRepository.findStudyWithTagsByPath("test");
         Tag saveTag = tagRepository.save(tag);
         studyService.addTag(test,saveTag);

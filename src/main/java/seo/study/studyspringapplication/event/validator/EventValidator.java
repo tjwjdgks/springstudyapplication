@@ -3,6 +3,7 @@ package seo.study.studyspringapplication.event.validator;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import seo.study.studyspringapplication.domain.Event;
 import seo.study.studyspringapplication.event.form.EventForm;
 
 import java.time.LocalDateTime;
@@ -34,5 +35,10 @@ public class EventValidator implements Validator {
         if(eventForm.getStartDateTime().isBefore(eventForm.getEndEnrollmentDateTime())){
             errors.rejectValue("startDateTime","wrong.dateTime","모임 시작 일시를 정확히 입력하세요.");
         }
+    }
+
+    public void validateUpdateForm(EventForm eventForm, Event event, Errors errors) {
+        if(eventForm.getLimitOfEnrollments()< event.getLimitOfEnrollments())
+            errors.rejectValue("limitOfEnrollments","wrong.value","확인된 참가 신청보다 모집 인원수가 커야 합니다.");
     }
 }
