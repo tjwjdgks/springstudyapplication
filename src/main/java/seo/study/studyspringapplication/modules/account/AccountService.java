@@ -32,7 +32,7 @@ import java.util.Set;
 // UserDetailsService bean이 하나만 있으면 SpringSecurity가 자동으로 이것을 사용한다
 @Slf4j
 @Service
-@Transactional // entity detach 상태 일때 traincation 없이 data 변경 하면 db 반영 안됨
+@Transactional // transaction 없이 data 변경 하면 db 반영 안됨
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
 

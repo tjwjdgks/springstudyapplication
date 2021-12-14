@@ -17,6 +17,7 @@ public class PackageDependencyTests {
     private static final String ACCOUNT = "..modules.account..";
     private static final String TAG = "..modules.tag..";
     private static final String ZONE = "..modules.zone..";
+    private static final String Notification = "..modules.notification..";
 
     @ArchTest
     ArchRule studyPackageRule = classes().that().resideInAPackage(STUDY) // 스터디 패키지 안에 들어 있는 클래스는
@@ -31,6 +32,10 @@ public class PackageDependencyTests {
     ArchRule accountPackageRule = classes().that().resideInAPackage(ACCOUNT)  // ACCOUNT 패키지 안에 들어 있는 클래스는
             .should().accessClassesThat().resideInAnyPackage(ACCOUNT,TAG,ZONE);  // ACCOUNT, TAG, ZONE 참조한다
 
+    @ArchTest
+    ArchRule notificationPackageRule = classes().that().resideInAPackage(Notification)
+            .should().onlyBeAccessed().byClassesThat().resideInAnyPackage(Notification,ACCOUNT);
+
     // 사이클 검사
     @ArchTest
     ArchRule cycleCheck = slices().matching("seo.study.studyspringapplication.modules.(*)..") // 모듈 조각
@@ -39,4 +44,7 @@ public class PackageDependencyTests {
     @ArchTest
     ArchRule modulesPackageRule = classes().that().resideInAPackage("..modules..")
             .should().onlyBeAccessed().byClassesThat().resideInAPackage("..modules..");
+
+
+
 }

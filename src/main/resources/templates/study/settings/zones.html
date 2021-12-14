@@ -15,10 +15,9 @@
             <div class="col-8">
                 <div class="row">
                     <h2 class="col-12"> 주요 활동 지역</h2>
-                </div>
-                <div class="row">
                     <div class="alert alert-info" role="alert">
-                    스터디에서 주로 다루는 주제를 태그로 등록하세요. 태그를 입력하고 콤마(,) 또는 엔터를 입력하세요.
+                        주로 스터디를 하는 지역을 등록하세요.<br/>
+                        시스템에 등록된 지역만 선택할 수 있습니다.
                     </div>
                     <div id ="whitelist" th:text="${whitelist}" hidden></div>
                     <input id="zones" type="text" name="zones" th:value="${#strings.listJoin(zones,',')}"

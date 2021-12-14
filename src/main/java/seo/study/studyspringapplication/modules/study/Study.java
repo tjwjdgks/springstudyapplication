@@ -1,6 +1,7 @@
 package seo.study.studyspringapplication.modules.study;
 
 import lombok.*;
+import org.springframework.data.jpa.repository.EntityGraph;
 import seo.study.studyspringapplication.modules.account.Account;
 import seo.study.studyspringapplication.modules.account.UserAccount;
 import seo.study.studyspringapplication.modules.tag.Tag;
@@ -30,6 +31,10 @@ import java.util.Set;
 })
 @NamedEntityGraph(name="Study.withMembers",attributeNodes = {
         @NamedAttributeNode("members")
+})
+@NamedEntityGraph(name ="Study.withTagsAndZones", attributeNodes = {
+  @NamedAttributeNode("zones"),
+  @NamedAttributeNode("tags")
 })
 @Entity
 @Setter @Getter @EqualsAndHashCode(of = "id")
@@ -157,7 +162,9 @@ public class Study {
     public String getEncodePath(String path){
         return URLEncoder.encode(path, StandardCharsets.UTF_8);
     }
-
+    public String getEncodePath(){
+        return URLEncoder.encode(this.path, StandardCharsets.UTF_8);
+    }
     public boolean isManagedBy(Account account) {
         return this.getManagers().contains(account);
     }

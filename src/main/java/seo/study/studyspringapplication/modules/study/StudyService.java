@@ -3,10 +3,12 @@ package seo.study.studyspringapplication.modules.study;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.modules.account.Account;
+import seo.study.studyspringapplication.modules.study.event.StudyCreatedEvent;
 import seo.study.studyspringapplication.modules.tag.Tag;
 import seo.study.studyspringapplication.modules.zone.Zone;
 import seo.study.studyspringapplication.modules.study.form.StudyDescriptionForm;
@@ -20,6 +22,7 @@ public class StudyService {
 
     private final StudyRepository repository;
     private final ModelMapper modelMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Study creatNewStudy(Study study, Account account) {
         Study newStudy = repository.save(study);
@@ -106,6 +109,7 @@ public class StudyService {
 
     public void publish(Study study) {
         study.publish();
+        this.eventPublisher.publishEvent(new StudyCreatedEvent(study));
     }
 
     public void close(Study study) {

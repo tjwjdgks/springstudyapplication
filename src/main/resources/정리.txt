@@ -61,3 +61,18 @@
      적용 방법 spring.mvc.hiddenmethod.filter.enabled=true, 적용시 히든 메서드를 값으로 requestMapping 해준다
      th:method 사용시 _method가 추가된다 (타임리프 제공)
 
+   * 알림은 부가적인 일이고 메인 로직에 영향을 주고 싶지 않을 때, 코드는 최대한 주요 로직에 집중하고 알림 처리는 로직 분리
+   => 비동기 async를 사용하는 것은 2가지 의미가 있음
+       트랜잭션 내에서 영향을 주고 싶지 않기 위해(다른 쓰레드로 로직을 분리함으로써 트랜잭션에 영향을 주지 않는다 * 트랜잭션은 한 쓰레드 안에서...)
+       응답 속도를 빠르게 하기 위해
+   => ApplicationEventPublisher와 스프링 @Async 기능을 사용해서 비동기 이벤트 기반
+
+   *ThreadPoolTaskExecutor(AsyncConfig 파일 참조)
+       CorePoolSize, MaxPoolSize, QueueCapacity 처리할 태스크(이벤트)가 생겼을 때,
+
+       ‘현재 일하고 있는 쓰레드 개수’(active thread)가 ‘코어 개수’(core pool size)보다 작으면 남아있는 쓰레드를 사용한다.
+       ‘현재 일하고 있는 쓰레드 개수’가 코어 개수만큼 차있으면 ‘큐 용량’(queue capacity)이 찰때까지 큐에 쌓아둔다.
+       큐 용량이 다 차면, 코어 개수를 넘어서 ‘맥스 개수’(max pool size)에 다르기 전까지 새로운 쓰레드를 만들어 처리한다.
+       맥스 개수를 넘기면 태스크를 처리하지 못한다.
+
+    * spring 트랜잭션은 기본적으로 REQUIRED 이다. 부모 트랜잭션에 참여하며, 없으면 새로운 트랜잭션을 시작한다. 트랜잭션은 선언과 가장 가까운 트랜잭션이 채택된다

@@ -51,6 +51,7 @@ public class Event {
 
     // 연관관계의 주인이 아니기 때문에 값을 변경해도 DB 반영 X, 연관 관계 주인 "event" 과 관련이 있음을 알려준다
     @OneToMany(mappedBy = "event")
+    @OrderBy("enrolledAt")
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
