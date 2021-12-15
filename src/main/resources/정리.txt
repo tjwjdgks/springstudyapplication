@@ -81,3 +81,18 @@
 
    * ibernate 에서 readOnly 설정이 들어갈 경우 트랜잭션 commit 시, 자동으로 flush 를 하지 않는다
      정확히는 session 의 flush_mode 가 FLUSH_MANUAL 로 변경
+
+   * querydsl 사용 (확장구현체를 만드는 방법)
+     ex) StudyRepostiory에 적용시 인터페이스를 만들고, 이 인터페이스 구현체는 뒤에 Impl을 붙여야 한다. StudyRepostiory(커스텀이름)Impl
+
+   * 여러개의 커스텀 repository가 있는 경우 메소드 시그니처가 겹칠 때 제일 먼저 선언 된것으로 사용
+   * 우선순위 : 커스텀 repository > 기본 curd repository
+
+   * N+1 Select 문제 해결
+     left (outer) join + fetchJoin + distinct로 해결. leftjoin은 fetchjoin을 하기 위해서 한다. fetchjoin은 join 관계의 데이터도 같이 가져온다, 중복데이터 distinct 해결
+     querydsl distinct() -> sql 상으로 전체 row에 대한 distinct 이지만 jpa가 쿼리 결과에 distinct 한 result만 가져온다 (transformer로 resultset 파싱할때 중복 result 삭제)
+
+     ( jpa 발생 쿼리 잘 볼것 (where 절 기존의 join 결과를 사용하는 것이 아닌 서브 쿼리를 만들 수 있음) )
+
+   * 페이지 기본값 20, Pageable 사용한다. 기본값 설정 @PageableDefault 사용
+     페이지 사용시에 전체 갯수를 가져와야 되서 count 쿼리가 하나 더 발생한다

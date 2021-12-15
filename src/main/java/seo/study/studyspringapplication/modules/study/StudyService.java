@@ -2,6 +2,7 @@ package seo.study.studyspringapplication.modules.study;
 
 
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,8 +12,13 @@ import seo.study.studyspringapplication.modules.account.Account;
 import seo.study.studyspringapplication.modules.study.event.StudyCreatedEvent;
 import seo.study.studyspringapplication.modules.study.event.StudyUpdateEvent;
 import seo.study.studyspringapplication.modules.tag.Tag;
+import seo.study.studyspringapplication.modules.tag.TagRepository;
 import seo.study.studyspringapplication.modules.zone.Zone;
 import seo.study.studyspringapplication.modules.study.form.StudyDescriptionForm;
+import seo.study.studyspringapplication.modules.zone.ZoneRepository;
+
+import java.util.HashSet;
+import java.util.Random;
 
 import static seo.study.studyspringapplication.modules.study.form.StudyForm.VALID_PATH_PATTERN;
 
@@ -24,6 +30,8 @@ public class StudyService {
     private final StudyRepository repository;
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
+    // test 용
+    private final ZoneRepository zoneRepository;
 
     public Study creatNewStudy(Study study, Account account) {
         Study newStudy = repository.save(study);
@@ -167,4 +175,24 @@ public class StudyService {
         study.removeMember(account);
     }
 
+    public void generateTestStudies(Account account) {
+        for(int i=0; i<30;i++){
+            String radomvalue = RandomString.make(5);
+            Study study = Study.builder()
+                    .title("테스트 스터디" + radomvalue)
+                    .path("test-" + i)
+                    .shortDescription("테스트용 스터디 입니다")
+                    .fullDescription("test")
+                    .tags(new HashSet<>())
+                    .zones(new HashSet<>())
+                    .managers(new HashSet<>())
+                    .build();
+            study.publish();
+            Study newStudy = this.creatNewStudy(study, account);
+            //Andong,안동시,North Gyeongsang
+            Zone zone = zoneRepository.findByCityAndProvince("Andong","North Gyeongsang");
+            newStudy.getZones().add(zone);
+
+        }
+    }
 }
