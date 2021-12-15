@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.modules.account.Account;
 import seo.study.studyspringapplication.modules.study.event.StudyCreatedEvent;
+import seo.study.studyspringapplication.modules.study.event.StudyUpdateEvent;
 import seo.study.studyspringapplication.modules.tag.Tag;
 import seo.study.studyspringapplication.modules.zone.Zone;
 import seo.study.studyspringapplication.modules.study.form.StudyDescriptionForm;
@@ -42,6 +43,7 @@ public class StudyService {
 
     public void updateStudyDescription(Study study, StudyDescriptionForm studyDescriptionForm) {
         modelMapper.map(studyDescriptionForm, study);
+        eventPublisher.publishEvent(new StudyUpdateEvent(study,"스터디 소개를 수정했습니다"));
     }
 
     public void enableStudyBanner(Study study) {
@@ -114,14 +116,20 @@ public class StudyService {
 
     public void close(Study study) {
         study.close();
+        eventPublisher.publishEvent(new StudyUpdateEvent(study,"스터디 종료 했습니다"));
+
     }
 
     public void startRecruit(Study study) {
         study.startRecruit();
+        eventPublisher.publishEvent(new StudyUpdateEvent(study,"스터디 인원 모집을 시작했습니다"));
+
     }
 
     public void stopRecruit(Study study) {
         study.stopRecruit();
+        eventPublisher.publishEvent(new StudyUpdateEvent(study,"스터디 인원 모집을 중단했습니다"));
+
     }
 
     public boolean isValidPath(String newPath) {

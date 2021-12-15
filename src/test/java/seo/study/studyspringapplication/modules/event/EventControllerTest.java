@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import seo.study.studyspringapplication.infra.MockMvcTest;
 import seo.study.studyspringapplication.modules.account.Account;
 import seo.study.studyspringapplication.modules.account.AccountFactory;
@@ -13,7 +14,6 @@ import seo.study.studyspringapplication.modules.account.WithAccount;
 import seo.study.studyspringapplication.modules.event.form.EventForm;
 import seo.study.studyspringapplication.modules.study.Study;
 import seo.study.studyspringapplication.modules.study.StudyFactory;
-import seo.study.studyspringapplication.modules.study.StudyService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

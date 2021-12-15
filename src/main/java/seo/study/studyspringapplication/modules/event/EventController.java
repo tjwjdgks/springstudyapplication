@@ -21,7 +21,6 @@ import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
-
 @Controller
 @RequestMapping("/study/{path}")
 @RequiredArgsConstructor
@@ -112,7 +111,8 @@ public class EventController {
     @DeleteMapping("/events/{eventId}")
     public String deleteEvent(@CurrentUser Account account, @PathVariable String path, @PathVariable Long eventId){
         Study study = studyService.getStudyToUpdateStatus(account, path);
-        eventRepository.delete(eventRepository.findById(eventId).orElseThrow());
+        Event event = eventRepository.findById(eventId).orElseThrow();
+        eventService.deleteEvent(event);
         return "redirect:/study/" + study.getEncodePath(path) + "/events";
 
     }

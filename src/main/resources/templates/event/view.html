@@ -137,8 +137,8 @@
             <dt class="font-weight-light">모집 방법</dt>
             <dd>
                 <!-- 풀패키지 경로를 알려주어야 한다 EventType.FCFS 안됨 -->
-                <span th:if="${event.eventType == T(seo.study.studyspringapplication.domain.EventType).FCFS}">선착순</span>
-                <span th:if="${event.eventType == T(seo.study.studyspringapplication.domain.EventType).CONFIRMATIVE}">관리자 확인</span>
+                <span th:if="${event.eventType == T(seo.study.studyspringapplication.modules.event.EventType).FCFS}">선착순</span>
+                <span th:if="${event.eventType == T(seo.study.studyspringapplication.modules.event.EventType).CONFIRMATIVE}">관리자 확인</span>
             </dd>
 
             <dt class="font-weight-light">모집 인원</dt>

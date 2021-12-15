@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import seo.study.studyspringapplication.infra.AbstractContainerBaseTest;
 import seo.study.studyspringapplication.infra.MockMvcTest;
 import seo.study.studyspringapplication.infra.mail.EmailMessage;
 import seo.study.studyspringapplication.infra.mail.EmailService;
@@ -31,10 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @MockMvcTest
-class AccountControllerTest {
+class AccountControllerTest extends AbstractContainerBaseTest {
 
-    @Container
-    private static final PostgreSQLContainer POSTGRE_SQL_CONTAINER = new PostgreSQLContainer(PostgreSQLContainer.IMAGE);
 
     @Autowired
     private MockMvc mockMvc;
