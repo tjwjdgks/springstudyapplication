@@ -3,6 +3,9 @@ package seo.study.studyspringapplication.modules.study;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
+import seo.study.studyspringapplication.modules.account.Account;
+
+import java.util.List;
 
 @Transactional(readOnly = true) // 데이터 변경 작업은 서비스에 위임
 public interface StudyRepository extends JpaRepository<Study,Long>, StudyRepositoryExtension {
@@ -32,4 +35,10 @@ public interface StudyRepository extends JpaRepository<Study,Long>, StudyReposit
 
     @EntityGraph(attributePaths = {"members","managers"})
     Study findStudyWithManagersAndMembersById(Long id);
+
+    List<Study> findFirst9ByPublishedAndAndClosedOrderByPublishedDateTimeDesc(boolean published, boolean closed);
+
+    List<Study> findFirst5ByManagersContainingAndClosedOrderByPublishedDateTimeDesc(Account account, boolean closed);
+
+    List<Study> findFirst5ByMembersContainingAndClosedOrderByPublishedDateTimeDesc(Account account, boolean closed);
 }

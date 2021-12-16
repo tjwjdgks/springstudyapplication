@@ -6,12 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 import seo.study.studyspringapplication.modules.account.Account;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+
+@NamedEntityGraph(
+        name = "Enrollment.withEventAndStudy",
+        attributeNodes = {
+                @NamedAttributeNode(value = "event",subgraph = "study")
+        },
+        subgraphs = @NamedSubgraph(name = "study",attributeNodes = @NamedAttributeNode("study"))
+)
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
 public class Enrollment {

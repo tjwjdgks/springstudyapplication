@@ -1,6 +1,7 @@
 package seo.study.studyspringapplication.modules.main;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,24 +10,37 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import seo.study.studyspringapplication.modules.account.AccountRepository;
 import seo.study.studyspringapplication.modules.account.CurrentUser;
 import seo.study.studyspringapplication.modules.account.Account;
+import seo.study.studyspringapplication.modules.event.EnrollmentRepository;
 import seo.study.studyspringapplication.modules.study.Study;
 import seo.study.studyspringapplication.modules.study.StudyRepository;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MainController {
 
     private final StudyRepository studyRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final AccountRepository accountRepository;
 
     @GetMapping("/")
     public String home(@CurrentUser Account account, Model model){
         if(account != null){
-            model.addAttribute(account);
+            Account accountLoaded = accountRepository.findAccountWithTagsAndZonesById(account.getId());
+            model.addAttribute("enrollmentList",enrollmentRepository.findEventAndStudyWithEnrollmentByAccountAndAcceptedOrderByEnrolledAtDesc(account,true));
+            model.addAttribute("studyList",studyRepository.findRecent9StudyByAccountTagsAndAccountZones(accountLoaded.getTags(),accountLoaded.getZones()));
+            model.addAttribute("studyManagerOf", studyRepository.findFirst5ByManagersContainingAndClosedOrderByPublishedDateTimeDesc(account,false));
+            model.addAttribute("studyMemberOf", studyRepository.findFirst5ByMembersContainingAndClosedOrderByPublishedDateTimeDesc(account,false));
+            model.addAttribute("account",accountLoaded);
+            return "index-login";
         }
+        List<Study> studyList = studyRepository.findFirst9ByPublishedAndAndClosedOrderByPublishedDateTimeDesc(true, false);
+        model.addAttribute("studyList",studyList);
         return "index";
     }
     @GetMapping("/login")

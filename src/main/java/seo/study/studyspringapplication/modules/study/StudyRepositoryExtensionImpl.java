@@ -8,15 +8,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import seo.study.studyspringapplication.modules.account.QAccount;
 import seo.study.studyspringapplication.modules.tag.QTag;
+import seo.study.studyspringapplication.modules.tag.Tag;
 import seo.study.studyspringapplication.modules.zone.QZone;
+import seo.study.studyspringapplication.modules.zone.Zone;
 
 import java.util.List;
+import java.util.Set;
+
 // querydsl 사용
 public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport implements StudyRepositoryExtension {
     /**
      * Creates a new {@link QuerydslRepositorySupport} instance for the given domain type.
      *
-     * @param domainClass must not be {@literal null}.
+     * @param //domainClass must not be {@literal null}.
      */
     public StudyRepositoryExtensionImpl() {
         super(Study.class); // 도메인 type 넘겨주어야 함
@@ -31,11 +35,27 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                         .or(study.zones.any().localNameOfCity.containsIgnoreCase(keyword))))
                 .leftJoin(study.tags, QTag.tag).fetchJoin()
                 .leftJoin(study.zones, QZone.zone).fetchJoin()
-                .leftJoin(study.members, QAccount.account).fetchJoin();
+                .leftJoin(study.members, QAccount.account).fetchJoin()
+                .distinct();
 
         // pageable 적용하기
         JPQLQuery<Study> pageableQuery = getQuerydsl().applyPagination(pageable, query);
         QueryResults<Study> fetchResults = pageableQuery.fetchResults(); // 페이지 정보가 포함되어 있음
         return new PageImpl<>(fetchResults.getResults(),pageable,fetchResults.getTotal());
+    }
+
+    @Override
+    public List<Study> findRecent9StudyByAccountTagsAndAccountZones(Set<Tag> tags, Set<Zone> zones) {
+        QStudy study = QStudy.study;
+        JPQLQuery<Study> jpqlQuery = from(study).where(study.published.isTrue()
+                        .and(study.closed.isFalse())
+                        .and(study.tags.any().in(tags))
+                        .and(study.zones.any().in(zones)))
+                .leftJoin(study.tags, QTag.tag).fetchJoin()
+                .leftJoin(study.zones, QZone.zone).fetchJoin()
+                .orderBy(study.publishedDateTime.desc())
+                .distinct()
+                .limit(9);
+        return jpqlQuery.fetch();
     }
 }
