@@ -4,6 +4,7 @@ package seo.study.studyspringapplication;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import seo.study.studyspringapplication.modules.event.Enrollment;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
@@ -12,6 +13,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 @AnalyzeClasses(packagesOf = StudyspringapplicationApplication.class)
 public class PackageDependencyTests {
 
+    private static final String MAIN= "..modules.main..";
     private static final String STUDY = "..modules.study..";
     private static final String EVENT = "..modules.event..";
     private static final String ACCOUNT = "..modules.account..";
@@ -22,7 +24,7 @@ public class PackageDependencyTests {
     @ArchTest
     ArchRule studyPackageRule = classes().that().resideInAPackage(STUDY) // 스터디 패키지 안에 들어 있는 클래스는
             .should().onlyBeAccessed().byClassesThat() // 스터디와 이벤트 클래스들에만 의해 접근 가능해야 한다
-            .resideInAnyPackage(STUDY,EVENT);
+            .resideInAnyPackage(STUDY,EVENT,MAIN);
 
     @ArchTest
     ArchRule eventPackageRule = classes().that().resideInAPackage(EVENT) // 이벤트 패키지 안에 들어 있는 클래스는
@@ -34,7 +36,7 @@ public class PackageDependencyTests {
 
     @ArchTest
     ArchRule notificationPackageRule = classes().that().resideInAPackage(Notification)
-            .should().onlyBeAccessed().byClassesThat().resideInAnyPackage(Notification,ACCOUNT);
+            .should().onlyBeAccessed().byClassesThat().resideInAnyPackage(Notification,ACCOUNT,STUDY, EVENT);
 
     // 사이클 검사
     @ArchTest

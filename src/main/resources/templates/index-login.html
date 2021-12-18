@@ -52,7 +52,9 @@
             <h5 class="font-weight-light mt-3" th:if="${#lists.isEmpty(studyList)}">관련 스터디가 없습니다.</h5>
             <h5 class="font-weight-light mt-3" th:if="${!#lists.isEmpty(studyList)}">주요 활동 지역의 관심 주제 스터디</h5>
             <div class="row justify-content-center">
-                <div th:replace="fragments.html::study-card-view (studyList=${studyList})"></div>
+
+                    <div th:replace="fragments.html::study-card-view (studyList=${studyList})"></div>
+
             </div>
         </div>
         <div class="col-md-3">
